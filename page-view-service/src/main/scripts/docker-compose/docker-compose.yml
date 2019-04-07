@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  mysql-dev:
+    image: mysql:5.7.25
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: pageviewservice
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+     - "/Volumes/Profile_HD/guilherme_folder/Developer/Docker/Data/MySQL:/var/lib/mysql"
+
+  rabbit-dev:
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "4369:4369"
+      - "25672:25672"
+      - "8082:15672"
+    volumes:
+      - "/Volumes/Profile_HD/guilherme_folder/Developer/Docker/Data/Rabbitmq:/var/lib/rabbitmq"
+    
+  pageviewservice:
+    image: gbvbahia01/pageviewservice
+    ports:
+      - "8081:8081"
+    restart: always
+    depends_on:
+      - mysql-dev
+      - rabbit-dev
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:mysql://mysql-dev:3306/pageviewservice'
+      SPRING_PROFILES_ACTIVE: 'mysql'
+      SPRING_RABBITMQ_HOST: 'rabbit-dev'
+      SPRING_DATASOURCE_USERNAME: 'root'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+#  springbootdocker:
+#    image: springframeworkguru/springbootdocker
+#    ports:
+#      - "8080:8080"
+#    restart: always
+#    depends_on:
+#      - rabbitmq
+#      - pageviewservice
+#    environment:
+#      SPRING_RABBITMQ_HOST: rabbitmq
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/actuator/health"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
