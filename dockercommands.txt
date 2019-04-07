@@ -1,0 +1,44 @@
+## Use to run mysql db docker image
+docker run --name mysqldb -p 3306:3306 -e MYSQL_DATABASE=pageviewservice -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -d mysql
+
+## Use to run RabbitMQ
+docker run --name rabbitmq -p 5671:5671 -p 5672:5672 rabbitmq
+
+## does not work
+docker run --name pageviewservice -p 8081:8081  springframeworkguru/pageviewservice
+
+## does not work
+docker run --name pageviewservice -p 8081:8081 -e SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/pageviewservice -e SPRING_PROFILES_ACTIVE=mysql springframeworkguru/pageviewservice
+
+docker run --name pageviewservice -p 8081:8081 \
+--link rabbitmq:rabbitmq \
+--link mysqldb:mysqldb \
+-e SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/pageviewservice \
+-e SPRING_PROFILES_ACTIVE=mysql  \
+-e SPRING_RABBITMQ_HOST=rabbitmq \
+springframeworkguru/pageviewservice
+
+
+# Example MVN Command for CI
+mvn clean package verify docker:push
+
+#start docker compose in background
+docker-compose up -d
+
+#stop docker-compose
+docker-compose down
+
+## Docker images commands:
+0. docker exec -it <container name> bash
+1. docker run -d -p 61616:61616 -p 8161:8161 cloudesire/activemq
+2. docker run -p 27017:27017 -v /Volumes/Profile_HD/guilherme_folder/Developer/Docker/Data/Mongo:/data/db -d Mongo
+{ Rabbitmq
+  3. docker run -d -v /Volumes/Profile_HD/guilherme_folder/Developer/Docker/Data/Rabbitmq:/var/lib/rabbitmq --hostname my-rabbit --name rabbit-dev -p 8082:15672 -p 5671:5671 -p 5672:5672 rabbitmq:3-management
+  4. docker run --restart always --name rabbitmq1 -p 5672:5672 -p 15672:15672 -e RABBITMQ_DEFAULT_USER=sca -e RABBITMQ_DEFAULT_PASS=passwordhere -v /docker-data/rabbitmq1/data:/var/lib/rabbitmq -d rabbitmq:management
+}
+5. docker run -d -p 3306:3306 -v /Volumes/Profile_HD/guilherme_folder/Developer/Docker/Data/MySQL:/var/lib/mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=yes --name mysql-dev mysql:5.7.25
+
+6. docker build -t spring-boot-docker .
+
+
+docker run --name pageviewservice -p 8081:8081 --link rabbit-dev:rabbitmq --link mysql-dev:mysqldb -e SPRING_DATASOURCE_USERNAME=root -e SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/pageviewservice -e SPRING_PROFILES_ACTIVE=mysql -e SPRING_RABBITMQ_HOST=rabbitmq gbvbahia01/pageviewservice
