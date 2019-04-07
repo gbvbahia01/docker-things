@@ -57,7 +57,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -100,22 +100,22 @@
                                 <env>
                                     <SPRING_RABBITMQ_HOST>rabbitmq</SPRING_RABBITMQ_HOST>
                                 </env>
-                                <!-- dependsOn>
+                                <dependsOn>
                                     <container>myrabbitmq</container>
-                                    <container>gbvbahia01/pageviewservice</container>
-                                </dependsOn -->
+                                    <container>pageviewservice</container>
+                                </dependsOn>
                             </run>
 						</image>
                         <!--mysql container-->
-						<!-- image>
+						<image>
 							<name>mysql:5.7.25</name>
-                            <alias>mysqldb</alias>
+                            <alias>mysql-dev</alias>
 							<run>
-                                
+
 								<ports>
                                     <port>3306:3306</port>
                                 </ports>
-                                
+
                                 <env>
                                     <MYSQL_DATABASE>pageviewservice</MYSQL_DATABASE>
                                     <MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
@@ -123,16 +123,16 @@
                                 <volumes>
                                 	<bind>/Volumes/Profile_HD/guilherme_folder/Developer/Docker/Data/MySQL:/var/lib/mysql</bind>
                                 </volumes>
-                                
+
                                 <wait>
                                     <time>10000</time>
                                 </wait>
 							</run>
-						</image -->
+						</image>
                         <!--rabbit container-->
-                        <!-- image>
+                        <image>
                             <name>rabbitmq:3-management</name>
-                            <alias>myrabbitmq</alias>
+                            <alias>rabbit-dev</alias>
                             <run>
                                 <ports>
                                     <port>5671</port>
@@ -144,46 +144,47 @@
                                 <volumes>
                                 	<bind>/Volumes/Profile_HD/guilherme_folder/Developer/Docker/Data/Rabbitmq:/var/lib/rabbitmq</bind>
                                 </volumes>
-                               
+
                                 <wait>
                                     <time>10000</time>
                                 </wait>
                             </run>
-                        </image -->
+                        </image>
 
                         <!--docker run &#45;&#45;name pageviewservice -p 8081:8081 &#45;&#45;link rabbitmq:rabbitmq &#45;&#45;link mysqldb:mysqldb-->
                         <!-- -e SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/pageviewservice -e SPRING_PROFILES_ACTIVE=mysql-->
                         <!-- -e SPRING_RABBITMQ_HOST=rabbitmq gbvbahia01/pageviewservice-->
-                        <!--  image>
-                            <name>gbvbahia01/springbootdocker</name>
-                            <alias>springbootdocker</alias>
+                        <image>
+                            <name>gbvbahia01/pageviewservice</name>
+                            <alias>pageviewservice</alias>
                             <run>
                                 <ports>
                                     <port>8081:8081</port>
                                 </ports>
                                 <links>
-                                    <link>myrabbitmq:rabbitmq</link>
-                                    <link>mysqldb:mysqldb</link>
+                                    <link>rabbit-dev:rabbitmq</link>
+                                    <link>mysql-dev:mysqldb</link>
                                 </links>
                                 <env>
                                     <SPRING_DATASOURCE_URL>jdbc:mysql://mysqldb:3306/pageviewservice</SPRING_DATASOURCE_URL>
                                     <SPRING_PROFILES_ACTIVE>mysql</SPRING_PROFILES_ACTIVE>
                                     <SPRING_RABBITMQ_HOST>rabbitmq</SPRING_RABBITMQ_HOST>
+                                    <SPRING_DATASOURCE_USERNAME>root</SPRING_DATASOURCE_USERNAME>
                                 </env>
                                 <dependsOn>
-                                    <container>myrabbitmq</container>
-                                    <container>mysqldb</container>
+                                    <container>rabbit-dev</container>
+                                    <container>mysql-dev</container>
                                 </dependsOn>
                                 <wait>
                                     <http>
-                                        <url>http://localhost:8081/health</url>
+                                        <url>http://localhost:8080</url>
                                         <method>GET</method>
                                         <status>200..399</status>
                                     </http>
                                     <time>150000</time>
                                 </wait>
                             </run>
-                        </image-->
+                        </image>
 					</images>
 				</configuration>
 			</plugin>
